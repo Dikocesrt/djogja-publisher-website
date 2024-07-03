@@ -1,17 +1,7 @@
 <?php
-    $host = "localhost";
-    $port = 3306;
-    $database = "db_djogja_publisher";
-    $user = "root";
-    $pw = "";
-    $connection = new PDO("mysql:host=$host:$port;dbname=$database", $user, $pw);
+    require "koneksi.php";
 
-    // $host = "localhost";
-    // $port = 3306;
-    // $database = "id22032364_db_perpustakaan";
-    // $user = "id22032364_root";
-    // $pw = "Dikodiko123;";
-    // $connection = new PDO("mysql:host=$host;dbname=$database", $user, $pw);
+    date_default_timezone_set('Asia/Jakarta');
 
     $username = "";
     $email = "";
@@ -19,53 +9,56 @@
     $confirmPassword = "";
 
     if(isset($_POST["register"])){
+        $nama = $_POST["nama"];
         $username = $_POST["username"];
         $email = $_POST["email"];
         $password = $_POST["password"];
         $confirmPassword = $_POST["confirm-password"];
         
-        if($username == ""){
-            ?>
-                <script>alert("Username tidak boleh kosong!!!");</script>
-            <?php
-        }else if($email == ""){
-            ?>
-                <script>alert("Email tidak boleh kosong!!!");</script>
-            <?php
-        }else if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
             ?>
                 <script>alert("Email tidak ditemukan!!!");</script>
-            <?php
-        }else if($password == ""){
-            ?>
-                <script>alert("Password tidak boleh kosong!!!");</script>
-            <?php
-        }else if($confirmPassword == ""){
-            ?>
-                <script>alert("Konfirmasi password tidak boleh kosong!!!");</script>
             <?php
         }else if($password != $confirmPassword){
             ?>
                 <script>alert("Password tidak cocok!!!");</script>
             <?php
         }else{
-            $sql = "insert into users (username, password, email) values (?, ?, ?)";
+            $sql = "SELECT COUNT(*) AS jumlah_user FROM user WHERE email = ?";
             $result = $connection->prepare($sql);
-            $result->execute([$username, $password, $email]);
-            $sql = "SELECT id FROM users WHERE username = ? AND password = ?";
-            $result = $connection->prepare($sql);
-            $result->execute([$username, $password]);
-            session_start();
+            $result->execute([$email]);
             foreach($result as $row){
-                $_SESSION['userId'] = $row['id'];
+                if($row['jumlah_user'] > 0){
+                    echo '<script>alert("Email sudah terdaftar!!!");</script>';
+                }else{
+                    $sql = "SELECT COUNT(*) AS jumlah_user FROM user WHERE username = ?";
+                    $result = $connection->prepare($sql);
+                    $result->execute([$username]);
+                    foreach($result as $row){
+                        if($row['jumlah_user'] > 0){
+                            echo '<script>alert("Username sudah terdaftar!!!");</script>';
+                        }else{
+                            $sql = "insert into user (nama, username, password, email, created_at) values (?, ?, ?, ?, ?)";
+                            $result = $connection->prepare($sql);
+                            $result->execute([$nama, $username, $password, $email]);
+                            $sql = "SELECT id FROM users WHERE username = ? AND password = ?";
+                            $result = $connection->prepare($sql);
+                            $result->execute([$nama, $username, $password, $email, date('Y-m-d H:i:s')]);
+                            session_start();
+                            foreach($result as $row){
+                                $_SESSION['userId'] = $row['id'];
+                            }
+                            $_SESSION['userUsername'] = $username;
+                            setcookie('username', $username, time() + 60 * 60 * 7);
+                            setcookie('password', $password, time() + 60 * 60 * 7);
+                            header("location: dashboard.php");
+                            ?>
+                            <script>alert("Berhasil mendaftarkan akun!!!");</script>
+                        <?php
+                        }
+                    }
+                }
             }
-            $_SESSION['username'] = $username;
-            setcookie('username', $username, time() + 60 * 60 * 7);
-            setcookie('password', $password, time() + 60 * 60 * 7);
-            header("location: dashboard.php");
-            ?>
-            <script>alert("Berhasil mendaftarkan akun!!!");</script>
-        <?php
         }
     }
     $connection = null;
@@ -79,7 +72,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <title>Registrasi Perpustakaan</title>
+    <title>Registrasi Djogja Publisher</title>
 </head>
 <body>
     <section class="vh-100">
@@ -91,20 +84,25 @@
                 </div>
                 <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
                     <form name="register" method="POST">
+                        <!-- Nama input -->
+                        <div class="form-outline mb-4">
+                            <input type="text" id="nama" name="nama" class="form-control form-control-lg" placeholder="Masukkan Nama Lengkap" required/>
+                        </div>
+
                         <!-- Username input -->
                         <div class="form-outline mb-4">
-                            <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="Enter a username" />
+                            <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="Masukkan Username" required/>
                         </div>
 
                         <!-- Email input -->
                         <div class="form-outline mb-4">
-                            <input type="email" id="email" name="email" class="form-control form-control-lg" placeholder="Enter a valid email address" />
+                            <input type="email" id="email" name="email" class="form-control form-control-lg" placeholder="Masukkan Email" required/>
                         </div>
     
                         <!-- Password input -->
                         <div class="form-outline mb-3">
                             <div class="input-group">
-                                <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Enter password" />
+                                <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Masukkan Password" required/>
                                 <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                     <i class="fas fa-eye" id="eye"></i>
                                 </button>
@@ -114,7 +112,7 @@
                         <!-- Confirmation Password input -->
                         <div class="form-outline mb-3">
                             <div class="input-group">
-                                <input type="password" id="confirm-password" name="confirm-password" class="form-control form-control-lg" placeholder="Enter Confirmation password" />
+                                <input type="password" id="confirm-password" name="confirm-password" class="form-control form-control-lg" placeholder="Masukkan Konfirmasi Password" required/>
                                 <button class="btn btn-outline-secondary" type="button" id="togglePassword2">
                                     <i class="fas fa-eye" id="eye2"></i>
                                 </button>

@@ -1,16 +1,11 @@
 <?php
-    $host = "localhost";
-    $port = 3306;
-    $database = "db_djogja_publisher";
-    $user = "root";
-    $pw = "";
-    $connection = new PDO("mysql:host=$host:$port;dbname=$database", $user, $pw);
+    require "koneksi.php";
 
     if (isset($_POST["login"])) {
         $username = $_POST["username"];
         $password = $_POST["password"];
         
-        $sql = "SELECT * FROM users WHERE username = ?";
+        $sql = "SELECT * FROM user WHERE username = ?";
         $result = $connection->prepare($sql);
         $result->execute([$username]);
         $userRow = $result->fetch(PDO::FETCH_ASSOC);
@@ -18,7 +13,7 @@
         if ($userRow) {
             if ($password == $userRow["password"]) {
                 session_start();
-                $_SESSION['username'] = $userRow["username"];
+                $_SESSION['userUsername'] = $userRow["username"];
                 $_SESSION['userId'] = $userRow["id"];
 
                 if(isset($_POST["remember-me"])) {
@@ -49,7 +44,7 @@ $connection = null;
     <link rel="stylesheet" href="css/login-signup.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <title>Login Perpustakaan</title>
+    <title>Login Djogja Publisher</title>
 </head>
 <body>
     <section class="vh-100">
@@ -63,13 +58,13 @@ $connection = null;
                     <form name="login" method="POST">
                         <!-- Username input -->
                         <div class="form-outline mb-4">
-                            <input name="username" type="text" id="username" class="form-control form-control-lg" placeholder="Enter username" />
+                            <input name="username" type="text" id="username" class="form-control form-control-lg" placeholder="Enter username" required/>
                         </div>
             
                         <!-- Password input -->
                         <div class="form-outline mb-3">
                             <div class="input-group">
-                                <input name="password" type="password" id="password" class="form-control form-control-lg" placeholder="Enter password" />
+                                <input name="password" type="password" id="password" class="form-control form-control-lg" placeholder="Enter password" required/>
                                 <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                     <i class="fas fa-eye" id="eye"></i>
                                 </button>
