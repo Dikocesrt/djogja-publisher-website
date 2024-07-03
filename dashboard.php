@@ -36,6 +36,8 @@
             <a class="nav-link" aria-current="page" href="dashboard.php">Home</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="history.php">History</a>
+          </li>
         </ul>
         <form class="form-inline my-2 my-lg-0" method="post" name="cari" action="dashboard.php">
           <div class="input-group">

@@ -44,7 +44,7 @@
 
             echo '<script>alert("Berhasil melakukan pesanan");</script>';
 
-            header("Location: dashboard.php");
+            header("Location: history.php");
         } catch (Exception $e) {
             echo '<script>alert("Gagal upload gambar karena ' . $e->getMessage() . '");</script>';
         }

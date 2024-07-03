@@ -68,6 +68,9 @@
           <li class="nav-item">
             <a class="nav-link" aria-current="page" href="dashboard.php">Home</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="history.php">History</a>
+          </li>
         </ul>
           <!-- Tombol Profil -->
           <div class="nav-item dropdown">
